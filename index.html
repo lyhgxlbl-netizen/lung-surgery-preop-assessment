@@ -1,478 +1,79 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>肺切除术前麻醉评估平台</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>肺切除术前麻醉决策支持平台</title>
 <style>
-:root{
-  --bg:#f6f8fb;
-  --card:#ffffff;
-  --text:#162033;
-  --muted:#68758a;
-  --line:#e5eaf0;
-  --primary:#2f6df6;
-  --primary-soft:#edf3ff;
-  --success:#16a36a;
-  --warning:#d99117;
-  --danger:#d64545;
-  --shadow:0 12px 30px rgba(31,50,81,.08);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-.container{max-width:980px;margin:0 auto;padding:18px 14px 48px}
-.hero{
-  background:linear-gradient(135deg,#255ee8,#4d8cff);
-  color:white;
-  border-radius:22px;
-  padding:24px 20px;
-  box-shadow:var(--shadow);
-}
-.hero h1{margin:0 0 8px;font-size:28px}
-.hero p{margin:0;color:rgba(255,255,255,.88);line-height:1.65;font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:18px;
-  box-shadow:var(--shadow);
-}
-.card h2{font-size:17px;margin:0 0 14px}
-label{display:block;font-size:13px;color:#48566a;margin:0 0 7px}
-.field{margin-bottom:13px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-input,select{
-  width:100%;
-  border:1px solid #d8dfeb;
-  background:#fff;
-  border-radius:12px;
-  padding:12px;
-  font-size:16px;
-  color:var(--text);
-  outline:none;
-}
-input:focus,select:focus{border-color:#7aa0ff;box-shadow:0 0 0 3px rgba(47,109,246,.10)}
-.help{font-size:12px;color:var(--muted);line-height:1.6}
-button{
-  border:0;
-  border-radius:12px;
-  padding:13px 16px;
-  font-weight:700;
-  font-size:15px;
-  cursor:pointer;
-}
-.primary{background:var(--primary);color:#fff;width:100%}
-.secondary{background:#fff;color:#2e5dcf;border:1px solid #bfd0ff;width:100%}
-.full{grid-column:1/-1}
-.result{display:none}
-.result.show{display:block}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.metric{
-  background:#f9fbff;
-  border:1px solid #dfe7f4;
-  border-radius:14px;
-  padding:14px;
-}
-.metric span{display:block;font-size:12px;color:var(--muted)}
-.metric b{display:block;font-size:22px;margin-top:6px}
-.badge{display:inline-flex;padding:7px 10px;border-radius:999px;font-size:13px;font-weight:700}
-.badge.good{background:#eaf8f2;color:var(--success)}
-.badge.mid{background:#fff6e7;color:var(--warning)}
-.badge.high{background:#fdecec;color:var(--danger)}
-.section-title{font-size:14px;font-weight:700;margin:16px 0 8px}
-ul{margin:8px 0 0;padding-left:21px;line-height:1.75}
-.formula{
-  background:#f8fafc;
-  border:1px dashed #ccd6e3;
-  border-radius:12px;
-  padding:12px;
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:12px;
-  line-height:1.6;
-  color:#45546a;
-}
-.footer{
-  margin-top:16px;
-  color:#7d899b;
-  font-size:12px;
-  line-height:1.7;
-}
-.notice{
-  background:var(--primary-soft);
-  color:#36537e;
-  border:1px solid #d5e2ff;
-  border-radius:14px;
-  padding:12px 14px;
-  margin-top:14px;
-  font-size:13px;
-  line-height:1.7;
-}
-@media(max-width:760px){
-  .grid{grid-template-columns:1fr}
-  .metrics{grid-template-columns:1fr 1fr}
-  .row{grid-template-columns:1fr}
-  .hero h1{font-size:24px}
-}
-@media print{
-  body{background:#fff}
-  .hero,.inputs,.actions,.footer,.notice{display:none!important}
-  .container{max-width:none;padding:0}
-  .card{box-shadow:none;border:1px solid #ccc}
-  .result{display:block!important}
-}
+:root{--navy:#10213d;--blue:#2864e8;--cyan:#13a8a8;--bg:#f3f6fa;--card:#fff;--line:#dfe6ef;--muted:#67758b;--good:#0b8f68;--warn:#c57a08;--bad:#c63f4a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+header{background:linear-gradient(125deg,#10213d,#17487d 65%,#147d83);color:#fff;padding:24px 16px}
+.wrap{max-width:1180px;margin:auto}.eyebrow{font-size:12px;letter-spacing:.12em;color:#9fe1dc;font-weight:800}h1{font-size:28px;margin:7px 0 8px}header p{margin:0;max-width:820px;color:#dce8f6;line-height:1.7;font-size:14px}
+.privacy{margin-top:13px;display:inline-flex;gap:7px;align-items:center;padding:7px 10px;background:#ffffff14;border:1px solid #ffffff25;border-radius:999px;font-size:12px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:18px}.step{padding:10px 8px;background:#ffffff12;border:1px solid #ffffff20;border-radius:11px;text-align:center;font-size:12px}.step b{display:block;font-size:17px;color:#82e0d8}
+main{padding:18px 14px 50px}.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.75fr);gap:16px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 10px 30px #17335a0b;margin-bottom:14px}.card h2{margin:0 0 15px;font-size:18px}.sub{font-size:12px;color:var(--muted);font-weight:400}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid.two{grid-template-columns:repeat(2,1fr)}.field label{display:block;font-size:13px;font-weight:650;margin:0 0 6px}.field small{display:block;color:var(--muted);margin-top:5px;line-height:1.45}
+input,select,textarea{width:100%;border:1px solid #ccd6e3;border-radius:10px;padding:11px;background:#fff;color:var(--navy);font-size:15px;outline:0}input:focus,select:focus,textarea:focus{border-color:#5b87ee;box-shadow:0 0 0 3px #2864e814}
+.mode{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}.mode label{border:1px solid var(--line);border-radius:12px;padding:11px;cursor:pointer;font-size:13px}.mode input{width:auto;margin-right:6px}
+.segments{display:grid;grid-template-columns:1fr 1fr;gap:12px}.lung{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:11px}.lung h3{font-size:13px;margin:0 0 9px}.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.checks label{font-size:12px;background:#fff;border:1px solid #e3e9f0;padding:7px;border-radius:8px}.checks input{width:auto}
+.note{background:#eef5ff;border-left:4px solid var(--blue);padding:10px 12px;border-radius:8px;font-size:12px;color:#49617e;line-height:1.6;margin-top:12px}.warnnote{background:#fff6e7;border-left-color:#dd940d}
+.sticky{position:sticky;top:12px}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{border:1px solid var(--line);background:#f9fbfd;border-radius:12px;padding:12px}.metric span{display:block;color:var(--muted);font-size:11px}.metric b{display:block;font-size:22px;margin-top:5px}.metric.wide{grid-column:1/-1}
+.bar{height:9px;background:#e8edf4;border-radius:9px;overflow:hidden;margin-top:9px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:100%}
+.badge{display:inline-block;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800;margin:12px 0}.good{background:#e8f8f2;color:var(--good)}.mid{background:#fff4df;color:var(--warn)}.high{background:#fdecef;color:var(--bad)}
+button{border:0;border-radius:11px;padding:12px 14px;font-weight:800;font-size:14px;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#edf3ff;color:#2457bd}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.alerts{padding-left:20px;font-size:13px;line-height:1.65}.formula{white-space:pre-wrap;background:#f6f8fb;border:1px dashed #bdc9d8;padding:11px;border-radius:10px;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace}
+.report{display:none}.report.show{display:block}.disclaimer{font-size:12px;color:var(--muted);line-height:1.65}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.sticky{position:static}.grid{grid-template-columns:1fr 1fr}.steps{grid-template-columns:repeat(5,120px);overflow:auto}.mode{grid-template-columns:1fr}.segments{grid-template-columns:1fr}}
+@media(max-width:560px){h1{font-size:23px}.grid,.grid.two{grid-template-columns:1fr}.checks{grid-template-columns:1fr 1fr}}
+@media print{header,.editor,.actions,.privacy{display:none!important}body{background:#fff}.layout{display:block}.sticky{position:static}.card{box-shadow:none}.report{display:block!important}}
 </style>
 </head>
 <body>
-<div class="container">
-
-  <section class="hero">
-    <h1>肺切除术前麻醉评估平台</h1>
-    <p>基于拟切除范围、术前肺功能、血气与运动能力，预测术后肺功能并进行围术期风险分层。适用于全肺切除、肺叶切除、肺段切除及楔形切除的术前评估与教学。</p>
-  </section>
-
-  <div class="notice">
-    平台采用两类预测方式：解剖肺段法与功能/灌注占比法。存在肺不张、中央气道阻塞、异质性肺气肿、既往肺切除或区域功能差异明显时，建议优先使用功能比例法。
-  </div>
-
-  <div class="grid inputs">
-    <section class="card">
-      <h2>1. 手术规划</h2>
-      <div class="field">
-        <label>手术类型</label>
-        <select id="procedure">
-          <option value="lobectomy">肺叶切除</option>
-          <option value="pneumonectomy">全肺切除</option>
-          <option value="segmentectomy">肺段切除</option>
-          <option value="wedge">楔形切除</option>
-          <option value="custom">自定义功能切除比例</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>标准切除范围</label>
-        <select id="standard">
-          <option value="3">右上叶（3/19）</option>
-          <option value="2">右中叶（2/19）</option>
-          <option value="5">右下叶（5/19）</option>
-          <option value="5">左上叶（5/19）</option>
-          <option value="4">左下叶（4/19）</option>
-        </select>
-      </div>
-
-      <div class="row">
-        <div class="field">
-          <label>拟切除有功能肺段数</label>
-          <input id="removedSegments" type="number" min="0" max="19" step="0.1" value="3">
-        </div>
-        <div class="field">
-          <label>当前有功能肺段总数</label>
-          <input id="totalSegments" type="number" min="1" max="19" step="0.1" value="19">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>功能/灌注切除比例（%）</label>
-        <input id="functionalLoss" type="number" min="0" max="100" step="0.1" placeholder="如SPECT/CT提示拟切除区域占42%">
-      </div>
-      <div class="help">如填写功能/灌注比例，平台优先使用该数值计算。</div>
-    </section>
-
-    <section class="card">
-      <h2>2. 术前肺功能</h2>
-      <div class="row">
-        <div class="field">
-          <label>FEV₁（L）</label>
-          <input id="fev1L" type="number" step="0.01" placeholder="例如 2.10">
-        </div>
-        <div class="field">
-          <label>FEV₁ %pred</label>
-          <input id="fev1Pct" type="number" step="0.1" placeholder="例如 72">
-        </div>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label>DLCO %pred</label>
-          <input id="dlcoPct" type="number" step="0.1" placeholder="例如 68">
-        </div>
-        <div class="field">
-          <label>MVV %pred（可选）</label>
-          <input id="mvvPct" type="number" step="0.1" placeholder="例如 65">
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>3. 血气与氧合</h2>
-      <div class="row">
-        <div class="field">
-          <label>PaO₂（mmHg）</label>
-          <input id="pao2" type="number" step="0.1" placeholder="例如 78">
-        </div>
-        <div class="field">
-          <label>PaCO₂（mmHg）</label>
-          <input id="paco2" type="number" step="0.1" placeholder="例如 42">
-        </div>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label>静息 SpO₂（%）</label>
-          <input id="spo2" type="number" step="0.1" placeholder="例如 96">
-        </div>
-        <div class="field">
-          <label>采血时吸氧</label>
-          <select id="oxygen">
-            <option value="no">否</option>
-            <option value="yes">是</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>4. CPET / 运动能力</h2>
-      <div class="row">
-        <div class="field">
-          <label>VO₂peak（ml·kg⁻¹·min⁻¹）</label>
-          <input id="vo2" type="number" step="0.1" placeholder="可选">
-        </div>
-        <div class="field">
-          <label>VO₂peak %pred</label>
-          <input id="vo2Pct" type="number" step="0.1" placeholder="可选">
-        </div>
-      </div>
-      <div class="field">
-        <label>功能状态</label>
-        <select id="status">
-          <option value="unknown">未评估</option>
-          <option value="good">活动耐量良好</option>
-          <option value="limited">活动耐量下降</option>
-          <option value="poor">明显活动受限 / 静息症状</option>
-        </select>
-      </div>
-    </section>
-
-    <section class="card full actions">
-      <button class="primary" onclick="calculate()">生成评估报告</button>
-    </section>
-  </div>
-
-  <section id="result" class="card result full" style="margin-top:14px">
-    <h2>术前麻醉评估结果</h2>
-
-    <div class="metrics">
-      <div class="metric">
-        <span>预计保留功能肺比例</span>
-        <b id="remain">—</b>
-      </div>
-      <div class="metric">
-        <span>ppoFEV₁</span>
-        <b id="ppoFevL">—</b>
-      </div>
-      <div class="metric">
-        <span>ppoFEV₁ %pred</span>
-        <b id="ppoFevPct">—</b>
-      </div>
-      <div class="metric">
-        <span>ppoDLCO %pred</span>
-        <b id="ppoDlco">—</b>
-      </div>
-    </div>
-
-    <div style="margin-top:14px">
-      <span id="riskBadge" class="badge good">待评估</span>
-    </div>
-
-    <div class="section-title">临床提示</div>
-    <ul id="advice"></ul>
-
-    <div class="section-title">计算过程</div>
-    <div id="formula" class="formula"></div>
-
-    <div class="section-title">下一步建议</div>
-    <ul id="nextSteps"></ul>
-
-    <div class="actions" style="margin-top:14px">
-      <button class="secondary" onclick="window.print()">打印 / 保存为 PDF</button>
-    </div>
-  </section>
-
-  <div class="footer">
-    仅供专业医疗人员辅助决策与教学使用，不替代正式临床诊断、专科评估或MDT决策。ppo指标应结合手术方式、影像学、心血管风险、肺功能异质性、运动能力以及围术期优化情况综合解读。页面数据仅在本地浏览器计算，不上传服务器。
-  </div>
-
+<header><div class="wrap"><div class="eyebrow">THORACIC ANESTHESIA · CLINICAL DECISION SUPPORT</div><h1>肺切除术前麻醉决策支持平台</h1><p>综合切除范围、肺功能、血气、运动耐量与心血管风险，生成预测术后肺功能和下一步评估建议。</p><div class="privacy">🔒 患者数据仅在本机浏览器处理，不上传服务器</div><div class="steps"><div class="step"><b>01</b>患者资料</div><div class="step"><b>02</b>手术规划</div><div class="step"><b>03</b>肺功能</div><div class="step"><b>04</b>血气与运动</div><div class="step"><b>05</b>评估报告</div></div></div></header>
+<main><div class="wrap layout"><div class="editor">
+<section class="card"><h2>01 患者资料 <span class="sub">用于报告记录，不参与单项 ppo 公式</span></h2><div class="grid">
+<div class="field"><label>姓名/病历号（可选）</label><input id="patient" placeholder="建议教学时使用匿名编号"></div><div class="field"><label>年龄（岁）</label><input id="age" type="number"></div><div class="field"><label>性别</label><select id="sex"><option>未填写</option><option>男</option><option>女</option></select></div>
+<div class="field"><label>身高（cm）</label><input id="height" type="number"></div><div class="field"><label>体重（kg）</label><input id="weight" type="number"></div><div class="field"><label>吸烟史</label><select id="smoke"><option>未填写</option><option>从不吸烟</option><option>既往吸烟，已戒</option><option>目前吸烟</option></select></div>
+<div class="field" style="grid-column:1/-1"><label>诊断与主要合并症</label><input id="dx" placeholder="例如：右上肺癌；COPD、冠心病"></div></div></section>
+<section class="card"><h2>02 手术规划</h2><div class="grid">
+<div class="field"><label>手术类型</label><select id="procedure"><option>肺叶切除</option><option>单侧全肺切除</option><option>双肺叶切除</option><option>袖式肺叶切除</option><option>解剖性肺段切除</option><option>联合肺段切除</option><option>楔形切除</option><option>既往肺切除后的再次手术</option><option>肺减容性质的切除</option><option>转移瘤多发楔形切除</option></select></div>
+<div class="field"><label>侧别</label><select id="side"><option>右侧</option><option>左侧</option><option>双侧/其他</option></select></div><div class="field"><label>拟切除肺叶</label><select id="lobe"><option value="3">右上叶（3段）</option><option value="2">右中叶（2段）</option><option value="5">右下叶（5段）</option><option value="5">左上叶（5段）</option><option value="4">左下叶（4段）</option><option value="">自定义</option></select></div></div>
+<h3 style="font-size:14px">预测方法</h3><div class="mode"><label><input type="radio" name="method" value="segment" checked>19 肺段法</label><label><input type="radio" name="method" value="function">灌注/功能比例法</label><label><input type="radio" name="method" value="wedge">楔形切除估算法</label></div>
+<div id="segmentPanel"><div class="grid two"><div class="field"><label>全肺有功能肺段数</label><input id="totalSeg" type="number" step=".1" value="19"></div><div class="field"><label>拟切除有功能肺段数</label><input id="removedSeg" type="number" step=".1" value="3"></div></div>
+<div class="segments"><div class="lung"><h3>右肺（10段）</h3><div class="checks" id="rightSeg"></div></div><div class="lung"><h3>左肺（9段，19段计数法）</h3><div class="checks" id="leftSeg"></div></div></div><div class="note">可直接输入段数，也可勾选具体肺段；勾选后系统自动更新拟切除段数。</div></div>
+<div id="functionPanel" hidden><div class="grid two"><div class="field"><label>拟切除区域功能占比（%）</label><input id="functionLoss" type="number" min="0" max="100" step=".1"></div><div class="field"><label>功能比例来源</label><select id="functionSource"><option>肺灌注显像</option><option>SPECT/CT</option><option>CT肺叶体积定量</option><option>3D肺功能成像</option><option>医生手工输入</option></select></div></div><div class="note">适用于全肺切除、中央阻塞、肺不张、异质性肺气肿、既往肺切除或解剖段数不能代表真实功能分布时。</div></div>
+<div id="wedgePanel" hidden><div class="grid two"><div class="field"><label>楔形估算方式</label><select id="wedgeMode"><option value="volume">CT拟切除肺体积比例（首选）</option><option value="lobe">术者估算占所在肺叶比例</option><option value="equiv">肺段当量法</option></select></div><div class="field"><label id="wedgeLabel">全肺拟切除体积比例（%）</label><input id="wedgeValue" type="number" step=".1"></div></div><div class="note warnnote">楔形切除结果均为估算值，实际功能损失受切除体积、肺组织质量、瘤周组织和术后复张影响。</div></div></section>
+<section class="card"><h2>03 术前肺功能</h2><div class="grid">
+<div class="field"><label>FEV₁（L）</label><input id="fevL" type="number" step=".01"></div><div class="field"><label>FEV₁ %pred</label><input id="fevPct" type="number" step=".1"></div><div class="field"><label>FVC（L，可选）</label><input id="fvc" type="number" step=".01"></div>
+<div class="field"><label>DLCO %pred</label><input id="dlco" type="number" step=".1"></div><div class="field"><label>MVV %pred（可选）</label><input id="mvv" type="number" step=".1"></div><div class="field"><label>既往肺切除史</label><select id="prior"><option>无</option><option>有，已按当前有功能肺段修正</option><option>有，尚未完成分肺功能修正</option></select></div></div></section>
+<section class="card"><h2>04 血气、运动耐量与心血管风险</h2><div class="grid">
+<div class="field"><label>PaO₂（mmHg）</label><input id="pao2" type="number" step=".1"></div><div class="field"><label>PaCO₂（mmHg）</label><input id="paco2" type="number" step=".1"></div><div class="field"><label>pH</label><input id="ph" type="number" step=".01"></div>
+<div class="field"><label>HCO₃⁻（mmol/L）</label><input id="hco3" type="number" step=".1"></div><div class="field"><label>静息 SpO₂（%）</label><input id="spo2" type="number" step=".1"></div><div class="field"><label>采样条件</label><select id="oxygen"><option value="air">空气</option><option value="o2">吸氧（需结合FiO₂）</option></select></div>
+<div class="field"><label>运动后最低 SpO₂（%）</label><input id="exSpo2" type="number" step=".1"></div><div class="field"><label>6MWT（m）</label><input id="sixmwt" type="number"></div><div class="field"><label>爬楼能力</label><select id="stairs"><option>未评估</option><option>≥5层或≥22 m</option><option>2–4层</option><option>&lt;2层/明显受限</option></select></div>
+<div class="field"><label>VO₂peak（ml·kg⁻¹·min⁻¹）</label><input id="vo2" type="number" step=".1"></div><div class="field"><label>VO₂peak %pred</label><input id="vo2Pct" type="number" step=".1"></div><div class="field"><label>RCRI</label><select id="rcri"><option value="0">0分</option><option value="1">1分</option><option value="2">2分</option><option value="3">≥3分</option></select></div></div>
+<div class="actions"><button class="secondary" id="reset">清空</button><button class="primary" id="generate">生成完整评估报告</button></div></section>
+<section id="report" class="card report"><h2>05 肺切除术前麻醉评估报告</h2><div id="reportBody"></div><div class="actions"><button class="secondary" onclick="window.print()">打印 / 保存 PDF</button><button class="primary" onclick="window.scrollTo({top:0,behavior:'smooth'})">返回顶部</button></div></section>
 </div>
-
+<aside class="sticky"><section class="card"><h2>实时预测摘要</h2><div class="metrics"><div class="metric wide"><span>预计保留功能肺组织</span><b id="remain">84.2%</b><div class="bar"><i id="remainBar"></i></div></div><div class="metric"><span>ppoFEV₁</span><b id="ppoL">—</b></div><div class="metric"><span>功能损失</span><b id="loss">15.8%</b></div><div class="metric"><span>ppoFEV₁ %pred</span><b id="ppoPct">—</b></div><div class="metric"><span>ppoDLCO %pred</span><b id="ppoDlco">—</b></div></div><div id="risk" class="badge good">等待完整肺功能数据</div><ul id="alerts" class="alerts"><li>输入 FEV₁ %pred 与 DLCO 后自动分层。</li></ul><div id="formula" class="formula">19肺段法：保留比例 = 1 − 3/19 = 84.2%</div></section><section class="card disclaimer"><b>重要声明</b><br>本平台提供风险支持信息，不以单一阈值自动输出“手术禁忌”。结果须结合影像、手术获益、患者意愿、微创路径、围术期优化和 MDT 综合判断，仅供专业人员教学与辅助决策。</section></aside>
+</div></main>
 <script>
-const procedure = document.getElementById("procedure");
-const standard = document.getElementById("standard");
-const removedSegments = document.getElementById("removedSegments");
-
-function setOptions(items){
-  standard.innerHTML = items.map(i => `<option value="${i[1]}">${i[0]}</option>`).join("");
-  removedSegments.value = items[0][1];
-}
-
-procedure.addEventListener("change", () => {
-  if(procedure.value === "pneumonectomy"){
-    setOptions([
-      ["右全肺（10/19）",10],
-      ["左全肺（9/19）",9]
-    ]);
-  }else if(procedure.value === "lobectomy"){
-    setOptions([
-      ["右上叶（3/19）",3],
-      ["右中叶（2/19）",2],
-      ["右下叶（5/19）",5],
-      ["左上叶（5/19）",5],
-      ["左下叶（4/19）",4]
-    ]);
-  }else if(procedure.value === "segmentectomy"){
-    setOptions([
-      ["单肺段（1/19）",1],
-      ["双肺段（2/19）",2],
-      ["三肺段（3/19）",3]
-    ]);
-  }else if(procedure.value === "wedge"){
-    setOptions([
-      ["楔形切除：建议填写功能切除比例",0.5]
-    ]);
-  }else{
-    setOptions([
-      ["自定义：请填写功能切除比例",0]
-    ]);
-  }
-});
-
-standard.addEventListener("change",()=>removedSegments.value=standard.value);
-
-function val(id){
-  const n=parseFloat(document.getElementById(id).value);
-  return Number.isFinite(n)?n:null;
-}
-
-function calculate(){
-  const funcLoss = val("functionalLoss");
-  const removed = val("removedSegments") ?? 0;
-  const total = val("totalSegments") ?? 19;
-
-  let lossFraction = funcLoss !== null ? funcLoss/100 : removed/total;
-  lossFraction = Math.max(0,Math.min(1,lossFraction));
-  const remainFraction = 1-lossFraction;
-
-  const fev1L = val("fev1L");
-  const fev1Pct = val("fev1Pct");
-  const dlcoPct = val("dlcoPct");
-  const ppoFevL = fev1L !== null ? fev1L*remainFraction : null;
-  const ppoFevPct = fev1Pct !== null ? fev1Pct*remainFraction : null;
-  const ppoDlco = dlcoPct !== null ? dlcoPct*remainFraction : null;
-
-  document.getElementById("remain").textContent=(remainFraction*100).toFixed(1)+"%";
-  document.getElementById("ppoFevL").textContent=ppoFevL!==null?ppoFevL.toFixed(2)+" L":"—";
-  document.getElementById("ppoFevPct").textContent=ppoFevPct!==null?ppoFevPct.toFixed(1)+"%":"—";
-  document.getElementById("ppoDlco").textContent=ppoDlco!==null?ppoDlco.toFixed(1)+"%":"—";
-
-  const advice=[];
-  const next=[];
-  let risk=0;
-
-  const ppoValues=[ppoFevPct,ppoDlco].filter(v=>v!==null);
-
-  if(ppoValues.length){
-    const min=Math.min(...ppoValues);
-
-    if(min>=60){
-      advice.push("ppoFEV₁ 与 ppoDLCO 若均 ≥60%pred，肺功能维度总体较有利。");
-      next.push("结合年龄、合并症、心血管风险、影像和手术复杂度完成常规围术期评估。");
-    }else if(min>=30){
-      risk=Math.max(risk,1);
-      advice.push("至少一项预测术后肺功能位于 30–59%pred，属于需要进一步功能分层的范围。");
-      next.push("建议结合爬楼/步行试验或CPET进一步评估运动储备。");
-    }else{
-      risk=2;
-      advice.push("至少一项预测术后肺功能 <30%pred，提示明显增高的围术期呼吸风险。");
-      next.push("建议CPET、分肺功能/灌注评估，并讨论缩小切除范围或替代治疗策略。");
-    }
-  }else{
-    advice.push("尚未填写 FEV₁ %pred 或 DLCO %pred，无法完成主要肺功能风险分层。");
-    next.push("补充完整肺功能检查后重新计算。");
-  }
-
-  const pao2=val("pao2");
-  const paco2=val("paco2");
-  const spo2=val("spo2");
-  const vo2=val("vo2");
-  const vo2Pct=val("vo2Pct");
-  const oxygen=document.getElementById("oxygen").value;
-
-  if(paco2!==null && paco2>45){
-    risk=Math.max(risk,1);
-    advice.push("PaCO₂ 升高：需判断慢性代偿、COPD、呼吸肌功能或急性通气不足。");
-    next.push("结合pH/HCO₃⁻、既往血气、呼吸系统病史及术后NIV/HFNC需求综合判断。");
-  }
-
-  if(oxygen==="no"){
-    if((pao2!==null && pao2<60)||(spo2!==null && spo2<90)){
-      risk=2;
-      advice.push("静息空气状态下存在明显低氧信号。");
-      next.push("建议明确低氧原因并优化后重新评估。");
-    }
-  }else{
-    if(pao2!==null || spo2!==null){
-      advice.push("当前氧合指标是在吸氧条件下获得，解释时应结合FiO₂或氧流量。");
-    }
-  }
-
-  if(vo2!==null){
-    if(vo2<10){
-      risk=2;
-      advice.push("VO₂peak <10 ml·kg⁻¹·min⁻¹，提示运动储备显著受限。");
-      next.push("属于高风险运动能力信号，建议MDT讨论手术获益、切除范围和替代方案。");
-    }else if(vo2<20){
-      risk=Math.max(risk,1);
-      advice.push("VO₂peak 10–20 ml·kg⁻¹·min⁻¹，提示运动储备中等或受限。");
-      next.push("结合ppoFEV₁、ppoDLCO及其他CPET参数进一步分层。");
-    }else{
-      advice.push("VO₂peak ≥20 ml·kg⁻¹·min⁻¹，运动储备较好。");
-    }
-  }
-
-  if(vo2Pct!==null && vo2Pct<75){
-    risk=Math.max(risk,1);
-    advice.push("VO₂peak %pred <75%，提示相对预计值的运动能力下降。");
-  }
-
-  const badge=document.getElementById("riskBadge");
-  if(risk===0){
-    badge.className="badge good";
-    badge.textContent="肺功能维度较有利";
-  }else if(risk===1){
-    badge.className="badge mid";
-    badge.textContent="中间风险 / 建议进一步分层";
-  }else{
-    badge.className="badge high";
-    badge.textContent="高风险信号";
-  }
-
-  const method = funcLoss!==null ? "功能/灌注占比法" : "解剖肺段法";
-  document.getElementById("formula").textContent =
-    method+"：保留功能比例 = 1 − "+
-    (funcLoss!==null ? funcLoss.toFixed(1)+"%" : removed+" ÷ "+total) +
-    " = "+(remainFraction*100).toFixed(1)+"%。\n"+
-    "ppoFEV₁ = 术前FEV₁ × 保留比例；ppoDLCO = 术前DLCO × 保留比例。";
-
-  document.getElementById("advice").innerHTML=advice.map(x=>"<li>"+x+"</li>").join("");
-  document.getElementById("nextSteps").innerHTML=next.map(x=>"<li>"+x+"</li>").join("");
-
-  const result=document.getElementById("result");
-  result.classList.add("show");
-  result.scrollIntoView({behavior:"smooth",block:"start"});
-}
-</script>
-</body>
-</html>
+const $=id=>document.getElementById(id), num=id=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:null};
+const right=["S1 尖","S2 后","S3 前","S4 外","S5 内","S6 背","S7 内基底","S8 前基底","S9 外基底","S10 后基底"],left=["S1+2 尖后","S3 前","S4 上舌","S5 下舌","S6 背","S7+8 前内基底","S9 外基底","S10 后基底","附加段当量"];
+function buildSeg(id,items){$(id).innerHTML=items.map((x,i)=>`<label><input type="checkbox" class="seg"> ${x}</label>`).join("")}buildSeg("rightSeg",right);buildSeg("leftSeg",left);
+document.querySelectorAll(".seg").forEach(x=>x.onchange=()=>{$("removedSeg").value=document.querySelectorAll(".seg:checked").length;calc()});
+document.querySelectorAll("input,select").forEach(x=>x.addEventListener("input",calc));
+document.querySelectorAll('input[name="method"]').forEach(x=>x.onchange=()=>{const m=document.querySelector('input[name="method"]:checked').value;$("segmentPanel").hidden=m!=="segment";$("functionPanel").hidden=m!=="function";$("wedgePanel").hidden=m!=="wedge";calc()});
+$("lobe").onchange=()=>{if($("lobe").value)$("removedSeg").value=$("lobe").value;calc()};
+$("wedgeMode").onchange=()=>{$("wedgeLabel").textContent=$("wedgeMode").value==="equiv"?"肺段当量（如0.3段）":$("wedgeMode").value==="lobe"?"占所在肺叶比例（%）":"全肺拟切除体积比例（%）";calc()};
+function prediction(){const m=document.querySelector('input[name="method"]:checked').value;let loss=0,desc="",estimate=false;if(m==="segment"){const r=num("removedSeg")||0,t=num("totalSeg")||19;loss=t?r/t:0;desc=`19肺段法：保留比例 = 1 − ${r}/${t}`}else if(m==="function"){loss=(num("functionLoss")||0)/100;desc=`功能比例法（${$("functionSource").value}）：保留比例 = 1 − ${(loss*100).toFixed(1)}%`}else{estimate=true;const v=num("wedgeValue")||0;if($("wedgeMode").value==="equiv"){loss=v/19;desc=`楔形肺段当量估算：保留比例 = 1 − ${v}/19`}else if($("wedgeMode").value==="lobe"){const l=parseFloat($("lobe").value)||5;loss=(v/100)*(l/19);desc=`楔形术者估算：所在肺叶${v}% × ${l}/19`}else{loss=v/100;desc=`楔形CT体积估算：保留比例 = 1 − ${v}%`}}loss=Math.max(0,Math.min(1,loss));return{loss,remain:1-loss,desc,estimate}}
+function calc(){const p=prediction(),fevL=num("fevL"),fevPct=num("fevPct"),dlco=num("dlco"),ppL=fevL===null?null:fevL*p.remain,ppF=fevPct===null?null:fevPct*p.remain,ppD=dlco===null?null:dlco*p.remain;
+$("remain").textContent=(p.remain*100).toFixed(1)+"%";$("loss").textContent=(p.loss*100).toFixed(1)+"%";$("remainBar").style.width=(p.remain*100)+"%";$("ppoL").textContent=ppL===null?"—":ppL.toFixed(2)+" L";$("ppoPct").textContent=ppF===null?"—":ppF.toFixed(1)+"%";$("ppoDlco").textContent=ppD===null?"—":ppD.toFixed(1)+"%";$("formula").textContent=p.desc+` = ${(p.remain*100).toFixed(1)}%\nppo指标 = 术前值 × 保留比例`+(p.estimate?"\n※ 楔形切除：估算值，存在不确定性":"");
+let level=0,a=[];const vals=[ppF,ppD].filter(v=>v!==null);if(vals.length){let min=Math.min(...vals);if(min<30){level=2;a.push("任一 ppo 指标 <30%pred：建议 CPET、功能成像和 MDT。")}else if(min<60){level=1;a.push("任一 ppo 指标 30–59%pred：建议低技术运动试验，必要时 CPET。")}else a.push("ppoFEV₁ 与 ppoDLCO 均 ≥60%pred：肺功能维度较有利。")}else a.push("输入 FEV₁ %pred 与 DLCO 后自动分层。");
+const co2=num("paco2"),o2=num("pao2"),sp=num("spo2"),ph=num("ph"),vo=num("vo2"),vp=num("vo2Pct"),ex=num("exSpo2"),r=+($("rcri").value||0);
+if(co2!==null&&co2>45){level=Math.max(level,1);a.push(`PaCO₂ ${co2} mmHg：判断慢性代偿、COPD稳定性、睡眠呼吸障碍及术后NIV需求。`)}if(ph!==null&&ph<7.35){level=Math.max(level,1);a.push("pH <7.35：需排查急性或失代偿性酸中毒。")}if($("oxygen").value==="air"&&((o2!==null&&o2<60)||(sp!==null&&sp<90))){level=2;a.push("空气状态存在明显低氧信号，建议明确原因并优化。")}if(ex!==null&&ex<90){level=Math.max(level,1);a.push("运动后 SpO₂ <90%，提示运动诱发低氧。")}
+if(vo!==null){if(vo<10){level=2;a.push("VO₂peak <10：极高风险运动储备信号。")}else if(vo<=20){level=Math.max(level,1);a.push("VO₂peak 10–20：风险升高，需结合 ppo 指标与术式。")}else a.push("VO₂peak >20：运动储备较好。")}else if(vp!==null&&vp>75)a.push("VO₂peak >75%pred：运动储备较好。");if(r>=2){level=Math.max(level,1);a.push(`RCRI ${r>=3?"≥3":r}分：心血管风险修饰升高，需结合症状、功能状态及手术风险。`)}
+const risk=$("risk");risk.className="badge "+(level===2?"high":level===1?"mid":"good");risk.textContent=level===2?"存在高/极高风险信号":level===1?"中间风险：需进一步分层":vals.length?"肺功能维度较有利":"等待完整肺功能数据";$("alerts").innerHTML=a.map(x=>`<li>${x}</li>`).join("");return{p,ppL,ppF,ppD,level,a}}
+$("generate").onclick=()=>{const x=calc(),label=x.level===2?"高风险信号":x.level===1?"中间风险":"肺功能维度较有利";$("reportBody").innerHTML=`<p><b>患者：</b>${$("patient").value||"未填写"}　<b>年龄：</b>${$("age").value||"—"}岁　<b>诊断：</b>${$("dx").value||"未填写"}</p><p><b>拟行术式：</b>${$("procedure").value}（${$("side").value}）　<b>评估结论：</b>${label}</p><div class="metrics"><div class="metric"><span>保留功能比例</span><b>${(x.p.remain*100).toFixed(1)}%</b></div><div class="metric"><span>ppoFEV₁</span><b>${x.ppL===null?"—":x.ppL.toFixed(2)+" L"}</b></div><div class="metric"><span>ppoFEV₁ %pred</span><b>${x.ppF===null?"—":x.ppF.toFixed(1)+"%"}</b></div><div class="metric"><span>ppoDLCO %pred</span><b>${x.ppD===null?"—":x.ppD.toFixed(1)+"%"}</b></div></div><h3>计算依据</h3><div class="formula">${$("formula").textContent}</div><h3>异常警示与下一步建议</h3><ul class="alerts">${x.a.map(v=>`<li>${v}</li>`).join("")}</ul><p class="disclaimer">结论为辅助决策信息，不构成手术禁忌判断。建议结合影像、心血管评估、患者意愿及MDT意见。</p>`;$("report").classList.add("show");$("report").scrollIntoView({behavior:"smooth"})};
+$("reset").onclick=()=>{if(confirm("确定清空当前录入吗？")){document.querySelectorAll("input").forEach(i=>{if(i.type==="radio")i.checked=i.value==="segment";else if(i.type==="checkbox")i.checked=false;else i.value=""});$("totalSeg").value=19;$("removedSeg").value=3;location.reload()}};
+calc();
+</script></body></html>
