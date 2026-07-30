@@ -1,12 +1,280 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>肺手术术前麻醉评估</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1769e0" />
+<title>肺手术术前麻醉评估 V1.0</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687387;--line:#e4e8f0;
+  --accent:#1769e0;--ok:#137a52;--warn:#b66a00;--risk:#b42318;
+  --shadow:0 8px 28px rgba(24,39,75,.08)
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--text)}
+.wrap{max-width:860px;margin:auto;padding:16px 14px 44px}
+.hero{padding:18px 4px 10px}
+.hero h1{font-size:28px;line-height:1.2;margin:0 0 8px}
+.hero p{margin:0;color:var(--muted);font-size:14px}
+.badge{display:inline-block;background:#e8f1ff;color:#1558b0;border-radius:999px;padding:5px 9px;font-weight:700;font-size:12px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:var(--shadow)}
+h2{font-size:18px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field label{display:block;font-size:13px;font-weight:700;margin:0 0 6px}
+.field small{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.5}
+input,select{width:100%;border:1px solid #cfd6e3;border-radius:12px;padding:12px 11px;font-size:16px;background:#fff;color:var(--text)}
+input:focus,select:focus{outline:2px solid #cfe0ff;border-color:var(--accent)}
+.full{grid-column:1/-1}
+.btn{width:100%;border:0;border-radius:14px;padding:14px 16px;background:var(--accent);color:#fff;font-weight:800;font-size:17px}
+.secondary{background:#eef3fb;color:#24476f;margin-top:8px}
+.result{display:none}
+.score{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.metric{border:1px solid var(--line);border-radius:14px;padding:12px}
+.metric .v{font-size:24px;font-weight:850}
+.metric .k{font-size:12px;color:var(--muted)}
+.risk{margin-top:12px;border-radius:14px;padding:13px;font-weight:750}
+.normal{background:#e9f8f1;color:var(--ok)}
+.moderate{background:#fff5e8;color:var(--warn)}
+.high{background:#fdecec;color:var(--risk)}
+.note{font-size:13px;line-height:1.65;color:#4c5870;background:#f8fafc;border-left:4px solid #9ab6dd;padding:10px 12px;border-radius:10px}
+.warnbox{font-size:13px;line-height:1.65;color:#7d3d00;background:#fff6e7;border-left:4px solid #e6a443;padding:10px 12px;border-radius:10px;margin-top:10px}
+.footer{color:#778195;font-size:12px;line-height:1.6;padding:10px 3px}
+.hide{display:none}
+@media(max-width:640px){.grid,.score{grid-template-columns:1fr}.hero h1{font-size:25px}}
+</style>
 </head>
 <body>
-  <h1>肺手术术前麻醉评估平台</h1>
-  <p>平台部署测试成功。</p>
+<div class="wrap">
+  <div class="hero">
+    <div class="badge">V1.0 · 2025 ERS/ESTS 评估框架</div>
+    <h1>肺手术术前麻醉评估平台</h1>
+    <p>预测术后肺功能 · 风险分层 · CPET / 进一步评估提示</p>
+  </div>
+
+  <div class="card">
+    <h2>① 术式与预计功能肺损失</h2>
+    <div class="grid">
+      <div class="field full">
+        <label>拟行术式</label>
+        <select id="surgery" onchange="syncSurgery()">
+          <option value="lobectomy">肺叶切除</option>
+          <option value="segmentectomy">肺段切除</option>
+          <option value="wedge">楔形切除</option>
+          <option value="pneumonectomy">全肺切除</option>
+          <option value="manual">自定义</option>
+        </select>
+      </div>
+
+      <div class="field full" id="lobeBox">
+        <label>肺叶</label>
+        <select id="lobe" onchange="setLobeLoss()">
+          <option value="3">右上叶（3/19）</option>
+          <option value="2">右中叶（2/19）</option>
+          <option value="5">右下叶（5/19）</option>
+          <option value="5">左上叶（5/19）</option>
+          <option value="4">左下叶（4/19）</option>
+        </select>
+        <small>采用传统 19 肺段解剖法作基础估算；若功能分布不均，应改用分肺功能数据。</small>
+      </div>
+
+      <div class="field full hide" id="segBox">
+        <label>计划切除肺段数</label>
+        <input id="segments" type="number" min="1" max="10" value="1" oninput="setSegmentLoss()" />
+      </div>
+
+      <div class="field full hide" id="pneuBox">
+        <label>全肺切除侧</label>
+        <select id="pneuSide" onchange="setPneuLoss()">
+          <option value="10">右全肺（解剖估算 10/19）</option>
+          <option value="9">左全肺（解剖估算 9/19）</option>
+        </select>
+        <small>全肺切除尤其建议优先采用定量灌注或其他分肺功能方法。</small>
+      </div>
+
+      <div class="field full">
+        <label>预计功能肺损失（%）</label>
+        <input id="loss" type="number" min="0" max="95" step="0.1" value="15.8" />
+        <small>楔形切除、肺不张、阻塞病变、肺气肿或灌注明显不均时，请按实际功能损失比例修正。</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>② 肺功能与氧合</h2>
+    <div class="grid">
+      <div class="field">
+        <label>FEV₁（% predicted）</label>
+        <input id="fev1" type="number" min="1" max="150" placeholder="例如 78" />
+      </div>
+      <div class="field">
+        <label>DLCO（% predicted）</label>
+        <input id="dlco" type="number" min="1" max="150" placeholder="例如 65" />
+      </div>
+      <div class="field">
+        <label>静息 SpO₂（%）</label>
+        <input id="spo2" type="number" min="50" max="100" placeholder="例如 96" />
+      </div>
+      <div class="field">
+        <label>PaCO₂（mmHg，可选）</label>
+        <input id="paco2" type="number" min="10" max="100" placeholder="例如 42" />
+      </div>
+      <div class="field full">
+        <label>VO₂peak（ml/kg/min，可选）</label>
+        <input id="vo2" type="number" min="1" max="60" step="0.1" placeholder="若已行 CPET 可输入" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="btn" onclick="calculate()">开始评估</button>
+    <button class="btn secondary" onclick="resetForm()">清空</button>
+  </div>
+
+  <div class="card result" id="result">
+    <h2>③ 评估结果</h2>
+    <div class="score">
+      <div class="metric"><div class="k">ppoFEV₁</div><div class="v" id="ppoF">—</div></div>
+      <div class="metric"><div class="k">ppoDLCO</div><div class="v" id="ppoD">—</div></div>
+    </div>
+    <div id="riskBox" class="risk"></div>
+    <div id="advice" class="note"></div>
+    <div id="alerts"></div>
+  </div>
+
+  <div class="card">
+    <h2>V1.0 判读逻辑</h2>
+    <div class="note">
+      2025 ERS/ESTS 指南建议使用 ppoFEV₁ 与 ppoDLCO 进行术前风险分层。V1.0 对 ppoDLCO 采用 ≥60%、40–59%、&lt;40% 作为相对正常、中度、高风险层；ppoFEV₁ 低于 60% 时提高警惕，低于 40% 时作为高风险提示。最终建议仍结合运动能力、心血管风险、手术范围及临床背景。
+    </div>
+    <div class="warnbox">
+      本工具用于术前麻醉评估辅助与教学，不替代胸外科、麻醉科、呼吸科多学科判断。全肺切除、边界肺功能、既往肺切除、明显肺不张/阻塞、肺气肿或灌注不均时，应优先结合定量灌注、功能 CT 或 CPET。
+    </div>
+  </div>
+
+  <div class="footer">
+    基础公式：ppo = 术前值 ×（1 − 预计功能肺损失比例）。19 段法仅适用于功能分布近似均匀时的基础估算。
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function syncSurgery(){
+  const s = $('surgery').value;
+  $('lobeBox').classList.toggle('hide', s !== 'lobectomy');
+  $('segBox').classList.toggle('hide', s !== 'segmentectomy');
+  $('pneuBox').classList.toggle('hide', s !== 'pneumonectomy');
+
+  if(s === 'lobectomy') setLobeLoss();
+  if(s === 'segmentectomy') setSegmentLoss();
+  if(s === 'pneumonectomy') setPneuLoss();
+  if(s === 'wedge') $('loss').value = '5';
+}
+
+function setLobeLoss(){
+  $('loss').value = (Number($('lobe').value)/19*100).toFixed(1);
+}
+
+function setSegmentLoss(){
+  $('loss').value = (Number($('segments').value || 0)/19*100).toFixed(1);
+}
+
+function setPneuLoss(){
+  $('loss').value = (Number($('pneuSide').value)/19*100).toFixed(1);
+}
+
+function dlcoTier(v){
+  if(v >= 60) return 0;
+  if(v >= 40) return 1;
+  return 2;
+}
+
+function fevTier(v){
+  if(v >= 60) return 0;
+  if(v >= 40) return 1;
+  return 2;
+}
+
+function tierText(t){
+  return ['相对正常肺功能风险层','中度肺功能风险层','高肺功能风险层'][t];
+}
+
+function calculate(){
+  const f = Number($('fev1').value);
+  const d = Number($('dlco').value);
+  const loss = Number($('loss').value);
+
+  if(!f || !d || loss < 0 || loss >= 100){
+    alert('请完整填写 FEV₁、DLCO 和合理的功能肺损失比例。');
+    return;
+  }
+
+  const factor = 1 - loss/100;
+  const pf = f * factor;
+  const pd = d * factor;
+  const t = Math.max(fevTier(pf), dlcoTier(pd));
+
+  $('ppoF').textContent = pf.toFixed(1) + '%';
+  $('ppoD').textContent = pd.toFixed(1) + '%';
+
+  const rb = $('riskBox');
+  rb.className = 'risk ' + ['normal','moderate','high'][t];
+  rb.textContent = tierText(t) + '（按较差指标）';
+
+  let advice = '';
+  if(t === 0){
+    advice = 'ppoFEV₁ 与 ppoDLCO 均 ≥60%。若心血管风险、症状和其他评估无明显异常，可进入常规围术期优化路径。';
+  } else if(t === 1){
+    advice = '存在 ppoFEV₁ 或 ppoDLCO 40–59%。建议结合运动耐量，并按临床情况进一步行低技术运动试验或 CPET，同时优化戒烟、肺康复、营养与合并症。';
+  } else {
+    advice = '存在 ppoFEV₁ 或 ppoDLCO <40%，提示高肺功能风险。建议胸外科-麻醉科-呼吸科多学科评估，优先结合 CPET 与分肺功能检查，并重新权衡切除范围和围术期计划。';
+  }
+
+  const v = Number($('vo2').value);
+  if(v){
+    if(v < 10){
+      advice += ' 已输入 VO₂peak <10 ml/kg/min，提示运动储备显著受限，应高度重视整体手术风险。';
+    } else if(v < 20){
+      advice += ' 已输入 VO₂peak 10–20 ml/kg/min，建议结合完整 CPET 参数与临床背景综合判断。';
+    } else {
+      advice += ' 已输入 VO₂peak ≥20 ml/kg/min，运动储备相对较好，但仍需结合肺功能和心血管风险。';
+    }
+  }
+
+  $('advice').textContent = advice;
+
+  let alerts = '';
+  const spo2 = Number($('spo2').value);
+  const co2 = Number($('paco2').value);
+
+  if(d < 40){
+    alerts += '<div class="warnbox">术前 DLCO <40%：属于显著异常，应提高对术后肺部并发症与总体风险的警惕。</div>';
+  }
+  if(spo2 && spo2 < 90){
+    alerts += '<div class="warnbox">静息 SpO₂ <90%：建议进一步明确低氧原因并优化后再评估。</div>';
+  }
+  if(co2 && co2 > 45){
+    alerts += '<div class="warnbox">PaCO₂ >45 mmHg：存在高碳酸血症，应结合 COPD、肥胖低通气或慢性呼吸衰竭背景评估。</div>';
+  }
+  if($('surgery').value === 'pneumonectomy'){
+    alerts += '<div class="warnbox">全肺切除：19 段法仅作粗略估算，建议优先采用定量灌注或其他分肺功能方法计算 ppo 值。</div>';
+  }
+
+  $('alerts').innerHTML = alerts;
+  $('result').style.display = 'block';
+  $('result').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function resetForm(){
+  ['fev1','dlco','spo2','paco2','vo2'].forEach(x => $(x).value = '');
+  $('surgery').value = 'lobectomy';
+  $('lobe').selectedIndex = 0;
+  syncSurgery();
+  $('result').style.display = 'none';
+}
+
+syncSurgery();
+</script>
 </body>
 </html>
